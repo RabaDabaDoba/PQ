@@ -76,6 +76,92 @@ int SLmain(int itterations, int max_data, int max_priority)
   return 0;
 }
 
+
+int SLPushBenchmark(int itterations,int max_data, int max_priority){
+  clock_t start, stop, runtime;
+
+  start = clock();
+  Node* pq = createNode(randint(max_data), randint(max_priority));
+  for (size_t i = 0; i < itterations; i++) {
+      push(&pq, randint(max_data), randint(max_priority));
+  }
+  stop = clock();
+  runtime = stop - start;
+
+  return runtime;
+}
+
+int SLPushAverageBenchmark(int itterations,int max_data, int max_priority){
+  clock_t start, stop, runtime;
+  int total;
+
+
+  for (int i = 0; i < itterations; i++) {
+    start = clock();
+    Node* pq = createNode(randint(max_data), randint(max_priority));
+    for (size_t i = 1; i < 512; i++) {
+        push(&pq, randint(max_data), randint(max_priority));
+    }
+    stop = clock();
+    total += stop - start;
+
+
+
+  }
+
+  return total/itterations;
+}
+
+int SLPushWorstBenchmark(int itterations,int max_data, int max_priority){
+  clock_t start, stop, runtime;
+  int worst;
+
+
+  for (int i = 0; i < itterations; i++) {
+    start = clock();
+    Node* pq = createNode(randint(max_data), randint(max_priority));
+    for (size_t i = 1; i < 512; i++) {
+        push(&pq, randint(max_data), randint(max_priority));
+    }
+    stop = clock();
+    runtime = stop - start;
+
+    if(worst < runtime){
+      worst = runtime;
+    }
+
+  }
+
+  return worst;
+}
+
+int SLPushBestBenchmark(int itterations,int max_data, int max_priority){
+  clock_t start, stop, runtime;
+  int best;
+
+
+  for (int i = 0; i < itterations; i++) {
+    start = clock();
+    Node* pq = createNode(randint(max_data), randint(max_priority));
+    for (size_t i = 1; i < 512; i++) {
+        push(&pq, randint(max_data), randint(max_priority));
+    }
+    stop = clock();
+    runtime = stop - start;
+
+    if(best > runtime){
+      best = runtime;
+    }
+
+  }
+
+  return best;
+}
+
+
+
+
+
 BenchInfo *pushBenchmark(int itterations,int max_data, int max_priority){
   clock_t start, stop, runtime;
   int total, best, worst;
@@ -102,10 +188,13 @@ BenchInfo *pushBenchmark(int itterations,int max_data, int max_priority){
   worst = stop - start;
   average += best;
 
+  int chunk = 64;
 
-  for (size_t i = 0; i < itterations; i++) {
+  for (size_t i = 0; i < itterations/64; i++) {
       start = clock();
-      push(&pq_2, randint(max_data), randint(max_priority));
+      for (size_t i = 8; i < 64; i++) {
+        push(&pq_2, randint(max_data), randint(max_priority));
+      }
       stop = clock();
 
       if(best > stop-start){
